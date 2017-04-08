@@ -1,0 +1,17 @@
+{
+  "name": "rxjs_coding",
+  "version": "0.0.1",
+  "description": "jonguk's rxjs coding",
+  "dependencies": {
+    "rxjs": "^5.3.0"
+  },
+  "devDependencies": {
+    "rxjs": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonguk0114/rxjs_coding.git"
+  }
+  "author": "jonguk.lee",
+  "homepage": "https://github.com/jonguk0114/rxjs_coding#readme"
+}
