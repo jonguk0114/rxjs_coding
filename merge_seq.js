@@ -1,10 +1,11 @@
-var Rx = require('rxjs/Rx');
-const { Observable } = Rx;
+const { Observable } = require('rxjs/Rx');
 
 function mergeSeq(...observables) {
-    const observableLength = arguments.length;
+    const observableLength = observables.length;
     return Observable.from(arguments)
-	.mergeMap((observable,index) => Observable.zip(observable.do(value => console.log(`do ${value}`)).take(1), Observable.of(index), 
+	.mergeMap((observable,index) => Observable.zip(
+			observable.do(value => console.log(`do ${value}`)).last(), 
+			Observable.of(index), 
 			(result, index) => {return {result, index}}))
 	.scan((acc, current) => {
 	   acc.results = null;
@@ -33,5 +34,4 @@ const req2$ = Observable.timer(4000).map(value => "req2");
 const req3$ = Observable.timer(2000).map(value => "req3");
 
 mergeSeq(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`)); 
-
 
