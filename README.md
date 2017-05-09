@@ -33,3 +33,12 @@ Thus, infinite observable causes infinite loop.
  subscribe result: req3
  */
  ```
+# License
+
+The MIT License   
+
+Copyright ⓒ 2017 Jonguk Lee  
+
+See [LICENSE](https://github.com/jonguk0114/rxjs_coding/blob/master/LICENSE.md)   
+
+
