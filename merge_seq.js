@@ -1,5 +1,5 @@
 const { Observable } = require('rxjs/Rx');
-const mergeSeq = function(first = false, ...observables) {
+const parallelConcat = function(first = false, ...observables) {
     const observableLength = observables.length;
     const selectOperatorName = first ? 'first' : 'last';
     return Observable.from(observables)
@@ -24,14 +24,17 @@ const mergeSeq = function(first = false, ...observables) {
 	   }
 	}, {nextIndex: 0}).pluck('results').concatAll();
 };
-const parallelConcatFirst = (...observables) => mergeSeq(true, ...observables);
-const parallelConcatLast = (...observables) => mergeSeq(false, ...observables);
+const parallelConcatFirst = (...observables) => parallelConcat(true, ...observables);
+const parallelConcatLast = (...observables) => parallelConcat(false, ...observables);
+const mergeSeq = parallelConcatLast;
 
 const req1$ = Observable.timer(2000).map(value => "req1");
 const req2$ = Observable.timer(4000).map(value => "req2");
 const req3$ = Observable.timer(2000).map(value => "req3");
 
-mergeSeq(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`));
-//parallelConcatLast(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`))
-//parallelConcatFirst(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`));
+//mergeSeq(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`));
+
+parallelConcatLast(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`));
+setTimeout(() => parallelConcatFirst(req1$, req2$, req3$).subscribe(value => console.log(`subscribe result: ${value}`)), 
+4500);
 
