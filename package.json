@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jonguk0114/rxjs_coding.git"
-  }
+  },
   "author": "jonguk.lee",
   "homepage": "https://github.com/jonguk0114/rxjs_coding#readme"
 }
