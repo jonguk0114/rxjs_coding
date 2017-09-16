@@ -45,12 +45,12 @@ Rx.Observable.range(1, 10)
 ```
 ## prototype operator
 ```js
-const source$ = Observable.flatMapContinue([flatmap arguements]));
+const result$ = source$.flatMapContinue([flatmap arguements]));
 ```
 
 ## lettable Operator 
 ```js
-Observable.let(flatMapContinueLettable([flatmap arguements]));
+const result$ = source$.let(flatMapContinueLettable([flatmap arguements]));
 ```
 
 # Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용 
