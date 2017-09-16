@@ -54,7 +54,7 @@ Observable.let(flatMapContinueLettable([flatmap arguements]));
 ```
 
 # Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용 
-distinctUntilChanged 연산자와 내부변수(count, prev)을 이용해서 개미수열을 만들어보았다.    
+distinctUntilChanged 연산자와 내부변수(count, prev)를 이용해서 개미수열을 만들어보았다.    
 look-and-say seqneuce implementation using distinctUntilChanged operator and internal variables(count, prev)   
 
 ```js
