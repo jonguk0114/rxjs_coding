@@ -35,7 +35,7 @@ Thus, infinite observable causes infinite loop.
  ```
 
 # flatMapContinue
-flatMap의 프로젝트함수가 리턴하는 옵저버블이 에러를 낼 때 이를 Observable.empty()를 대신 리턴해줌으로써 무시하고 다음 emit하는 값을 계속하도록 하기위함 
+flatMap의 프로젝트함수가 리턴하는 옵저버블이 에러를 낼 때 이를 Observable.empty()를 대신 리턴해줌으로써 무시하고 다음 emit하는 값을 계속하도록 하기위함   
 When the Observable returned by flatMap project function throws error, the error is ignored by Rx.Observable.empty() and continue next emitted values.
 ```js
 Rx.Observable.range(1, 10)
