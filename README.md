@@ -33,6 +33,64 @@ Thus, infinite observable causes infinite loop.
  subscribe result: req3
  */
  ```
+
+# flatMapContinue
+flatMap의 프로젝트함수가 리턴하는 옵저버블이 에러를 낼 때 이를 Observable.empty()를 대신 리턴해줌으로써 무시하고 다음 emit하는 값을 계속하도록 하기위함 
+When the Observable returned by flatMap project function throws error, the error is ignored by Rx.Observable.empty() and continue next emitted values.
+```js
+Rx.Observable.range(1, 10)
+	.let(flatMapContinueLettable(x => x % 2 === 0 ? Rx.Observable.of(x+2) : Rx.Observable.throw(new Error('error'))))
+	.flatMapContinue(x => x % 2 === 0 ? Rx.Observable.of(x+1) : Rx.Observable.throw(new Error('error')))
+	.subscribe(result => console.log(`result ${result}`));
+```
+## prototype operator
+```js
+const source$ = Observable.flatMapContinue([flatmap arguements]));
+```
+
+## lettable Operator 
+```js
+Observable.let(flatMapContinueLettable([flatmap arguements]));
+```
+
+# Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용 
+distinctUntilChanged 연산자와 내부변수(count, prev)을 이용해서 개미수열을 만들어보았다.    
+look-and-say seqneuce implementation using distinctUntilChanged operator and internal variables(count, prev)   
+
+```js
+const Rx = require('rxjs/Rx');
+function next(observable) {
+	let count = 1;
+	let prev = -1;
+	return observable
+			.do(x => x === prev && count++) // same value count
+			.distinctUntilChanged() // distinct value only until changed
+			.map(current => ({
+				prev,
+				current
+			})) // keep prev and current
+			.do(prevCurrent => prev = prevCurrent.current) // reset prev
+			.concatMap(prevCurrent => prevCurrent.prev !== -1 ? Rx.Observable.of(count, prevCurrent.prev) : Rx.Observable.empty()) // next Observable
+			.do(x => count = 1) // reset count
+			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prev))); // last Observable
+}
+
+function lookAndSaySeq(n) { 
+	return Rx.Observable.range(1, n)
+			.reduce((next$, current) => current === 1 ? Rx.Observable.of(1) : next(next$), null)
+			.concatAll();
+}
+
+const n = 5;
+console.log(`==== sequence ${n} ====`);
+lookAndSaySeq(n).startWith(`${n} sequence: `).finally(() => console.log('')).subscribe(x => process.stdout.write(`${x}`));
+```
+
+## references
+https://en.wikipedia.org/wiki/Look-and-say_sequence   
+https://leanpub.com/programming-look-and-say  
+
+
 # License
 
 The MIT License   
