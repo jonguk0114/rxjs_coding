@@ -86,7 +86,7 @@ console.log(`==== sequence ${n} ====`);
 lookAndSaySeq(n).startWith(`${n} sequence: `).finally(() => console.log('')).subscribe(x => process.stdout.write(`${x}`));
 ```
 
-## references
+## Look-and-say sequence References
 https://en.wikipedia.org/wiki/Look-and-say_sequence   
 https://leanpub.com/programming-look-and-say  
 
