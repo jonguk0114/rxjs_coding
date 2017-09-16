@@ -43,12 +43,12 @@ Rx.Observable.range(1, 10)
 	.flatMapContinue(x => x % 2 === 0 ? Rx.Observable.of(x+1) : Rx.Observable.throw(new Error('error')))
 	.subscribe(result => console.log(`result ${result}`));
 ```
-## prototype operator
+## Prototype operator
 ```js
 const result$ = source$.flatMapContinue([flatmap arguements]));
 ```
 
-## lettable Operator 
+## Lettable operator 
 ```js
 const result$ = source$.let(flatMapContinueLettable([flatmap arguements]));
 ```
