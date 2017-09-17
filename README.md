@@ -39,9 +39,9 @@ flatMap의 프로젝트함수가 리턴하는 옵저버블이 에러를 낼 때 
 When the Observable returned by flatMap project function throws error, the error is ignored by Rx.Observable.empty() and continue next emitted values.
 ```js
 Rx.Observable.range(1, 10)
-	.let(flatMapContinueLettable(x => x % 2 === 0 ? Rx.Observable.of(x+2) : Rx.Observable.throw(new Error('error'))))
-	.flatMapContinue(x => x % 2 === 0 ? Rx.Observable.of(x+1) : Rx.Observable.throw(new Error('error')))
-	.subscribe(result => console.log(`result ${result}`));
+    .let(flatMapContinueLettable(x => x % 2 === 0 ? Rx.Observable.of(x+2) : Rx.Observable.throw(new Error('error'))))
+    .flatMapContinue(x => x % 2 === 0 ? Rx.Observable.of(x+1) : Rx.Observable.throw(new Error('error')))
+    .subscribe(result => console.log(`result ${result}`));
 ```
 ## Prototype operator
 ```js
@@ -60,30 +60,30 @@ look-and-say seqneuce implementation using distinctUntilChanged operator and int
 ```js
 const Rx = require('rxjs/Rx');
 function next(prevObservable) {
-	if (prevObservable === null) {
-		return Rx.Observable.of(1);
-	}
-	let count = 1;
-	let prevValue = -1;
-	return prevObservable
-			.do(x => x === prevValue && count++) // same value count
-			.distinctUntilChanged() // distinct value only until changed
-			.do(x => prevValue = prevValue === -1 ? x : prevValue) // if first time, set prevValue to value only (init)
-			.skip(1) // skip first time because first time is before value changed or stream is completed
-			.map(newValue => ({prevValue, newValue, count})) // keep prev and new
-			.do(prevAndNew => [prevValue, count] = [prevAndNew.newValue, 1]) // reset prevValue and count
-			.map(prevAndNew => ({
-				value: prevAndNew.prevValue,
-				count: prevAndNew.count
-			})) // prevAndNew -> prev Only		
-			.concatMap(prev => Rx.Observable.of(prev.count, prev.value)) // next Observable
-			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prevValue))); // last Observable
+    if (prevObservable === null) {
+        return Rx.Observable.of(1);
+    }
+    let count = 1;
+    let prevValue = -1;
+    return prevObservable
+            .do(x => x === prevValue && count++) // same value count
+            .distinctUntilChanged() // distinct value only until changed
+            .do(x => prevValue = prevValue === -1 ? x : prevValue) // if first time, set prevValue to value only (init)
+            .skip(1) // skip first time because first time is before value changed or stream is completed
+            .map(newValue => ({prevValue, newValue, count})) // keep prev and new
+            .do(prevAndNew => [prevValue, count] = [prevAndNew.newValue, 1]) // reset prevValue and count
+            .map(prevAndNew => ({
+                value: prevAndNew.prevValue,
+                count: prevAndNew.count
+            })) // prevAndNew -> prev Only		
+            .concatMap(prev => Rx.Observable.of(prev.count, prev.value)) // next Observable
+            .concat(Rx.Observable.defer(() => Rx.Observable.of(count, prevValue))); // last Observable
 }
 
 function lookAndSaySeq(n) {
-	return Rx.Observable.range(1, n)
-			.reduce((next$, current) => next(next$), null)
-			.concatAll();
+    return Rx.Observable.range(1, n)
+            .reduce((next$, current) => next(next$), null)
+            .concatAll();
 }
 
 const n = 5;
