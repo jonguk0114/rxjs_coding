@@ -59,6 +59,9 @@ look-and-say seqneuce implementation using distinctUntilChanged operator and int
 
 ```js
 const Rx = require('rxjs/Rx');
+const n = 10;  // sequence number 
+const m = 100; // characters length
+const completeSubject = new Rx.Subject().take(m).last();
 function next(prevObservable) {
     if (prevObservable === null) {
         return Rx.Observable.of(1);
@@ -66,29 +69,29 @@ function next(prevObservable) {
     let count = 1;
     let prevValue = -1;
     return prevObservable
+            .takeUntil(completeSubject) // each observable should be complete
             .do(x => x === prevValue && count++) // same value count
             .distinctUntilChanged() // distinct value only until changed
-            .do(x => prevValue = prevValue === -1 ? x : prevValue) // if first time, set prevValue to value only (init)
-            .skip(1) // skip first time because first time is before value changed or stream is completed
             .map(newValue => ({prevValue, newValue, count})) // keep prev and new
             .do(prevAndNew => [prevValue, count] = [prevAndNew.newValue, 1]) // reset prevValue and count
-            .map(prevAndNew => ({
-                value: prevAndNew.prevValue,
-                count: prevAndNew.count
-            })) // prevAndNew -> prev Only		
+            .skip(1) // skip first time because first time is before value changed or stream is completed
+            .map(prevAndNew => ({value: prevAndNew.prevValue, count: prevAndNew.count})) // prevAndNew -> prev Only
             .concatMap(prev => Rx.Observable.of(prev.count, prev.value)) // next Observable
             .concat(Rx.Observable.defer(() => Rx.Observable.of(count, prevValue))); // last Observable
 }
-
-function lookAndSaySeq(n) {
+function lookAndSaySeq(n, m) {
     return Rx.Observable.range(1, n)
-            .reduce((next$, current) => next(next$), null)
-            .concatAll();
+            .reduce(next$ => next(next$), null)
+            .concatAll()
+            .do(x => completeSubject.next(x))
+            .take(m);
 }
 
-const n = 5;
-console.log(`==== sequence ${n} ====`);
-lookAndSaySeq(n).startWith(`${n} sequence: `).finally(() => console.log('')).subscribe(x => process.stdout.write(`${x}`));
+console.log(`==== sequence ${n}, ${m} characters ====`);
+lookAndSaySeq(n, m)
+    .startWith(`${n} sequence: `)
+    .finally(() => console.log(''))
+    .subscribe(x => process.stdout.write(`${x}`))
 ```
 
 ## Look-and-say sequence References

@@ -1,7 +1,6 @@
 const Rx = require('rxjs/Rx');
 const n = process.argv.length >= 3 ? parseInt(process.argv[2]) : 5;
-const m = process.argv.length >= 4 ? (process.argv[3] === 'max' ? Number.MAX_VALUE :
-    parseInt(process.argv[3])) : 1000;
+const m = process.argv.length >= 4 ? (process.argv[3] === 'max' ? Number.MAX_VALUE : parseInt(process.argv[3])) : 1000;
 const showAll = process.argv.length >= 5 ? process.argv[4] === 'showAll' : false;
 
 const completeSubject = new Rx.Subject().take(m).last();
@@ -30,14 +29,15 @@ function lookAndSaySeq(n, m) {
             .take(m);
 }
 if ( n <= 10 || showAll) {
-    console.log(`==== sequence 1 ~ ${n} ====`);
+    console.log(`==== sequence 1 ~ ${n}, ${m} characters ==== `);
     Rx.Observable.range(1, n)
         .do(i => process.stdout.write(`${i} sequence: `))
         .concatMap(i => lookAndSaySeq(i, m).finally(() => console.log('')))
         .subscribe(x => process.stdout.write(`${x}`));
 }
 
-console.log(`==== sequence ${n} Only ====`);
+console.log(`==== sequence ${n}, ${m} characters ====`);
 lookAndSaySeq(n, m)
+    .startWith(`${n} sequence: `)
     .finally(() => console.log(''))
     .subscribe(x => process.stdout.write(`${x}`));
