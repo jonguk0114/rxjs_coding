@@ -1,4 +1,4 @@
-# rxjs_coding 
+# rxjs_coding
  RxJS로 코딩해서 만든 것 모아놓아볼까 합니다.  
  Jonguk's RxJS coding  
 
@@ -48,36 +48,41 @@ Rx.Observable.range(1, 10)
 const result$ = source$.flatMapContinue([flatmap arguements]));
 ```
 
-## Lettable operator 
+## Lettable operator
 ```js
 const result$ = source$.let(flatMapContinueLettable([flatmap arguements]));
 ```
 
-# Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용 
+# Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용
 distinctUntilChanged 연산자와 내부변수(count, prev)를 이용해서 개미수열을 만들어보았다.    
 look-and-say seqneuce implementation using distinctUntilChanged operator and internal variables(count, prev)   
 
 ```js
 const Rx = require('rxjs/Rx');
-function next(observable) {
+function next(prevObservable) {
+	if (prevObservable === null) {
+		return Rx.Observable.of(1);
+	}
 	let count = 1;
-	let prev = -1;
-	return observable
-			.do(x => x === prev && count++) // same value count
+	let prevValue = -1;
+	return prevObservable
+			.do(x => x === prevValue && count++) // same value count
 			.distinctUntilChanged() // distinct value only until changed
-			.map(current => ({
-				prev,
-				current
-			})) // keep prev and current
-			.do(prevCurrent => prev = prevCurrent.current) // reset prev
-			.concatMap(prevCurrent => prevCurrent.prev !== -1 ? Rx.Observable.of(count, prevCurrent.prev) : Rx.Observable.empty()) // next Observable
-			.do(x => count = 1) // reset count
-			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prev))); // last Observable
+			.do(x => prevValue = prevValue === -1 ? x : prevValue) // if first time, set prevValue to value only (init)
+			.skip(1) // skip first time because first time is before value changed or stream is completed
+			.map(newValue => ({prevValue, newValue, count})) // keep prev and new
+			.do(prevAndNew => [prevValue, count] = [prevAndNew.newValue, 1]) // reset prevValue and count
+			.map(prevAndNew => ({
+				value: prevAndNew.prevValue,
+				count: prevAndNew.count
+			})) // prevAndNew -> prev Only		
+			.concatMap(prev => Rx.Observable.of(prev.count, prev.value)) // next Observable
+			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prevValue))); // last Observable
 }
 
-function lookAndSaySeq(n) { 
+function lookAndSaySeq(n) {
 	return Rx.Observable.range(1, n)
-			.reduce((next$, current) => current === 1 ? Rx.Observable.of(1) : next(next$), null)
+			.reduce((next$, current) => next(next$), null)
 			.concatAll();
 }
 
@@ -98,5 +103,3 @@ The MIT License
 Copyright ⓒ 2017 Jonguk Lee  
 
 See [LICENSE](https://github.com/jonguk0114/rxjs_coding/blob/master/LICENSE.md)   
-
-
