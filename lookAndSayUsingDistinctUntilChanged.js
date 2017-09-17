@@ -1,23 +1,28 @@
 const Rx = require('rxjs/Rx');
-function next(observable) {
+function next(prevObservable) {
+	if (prevObservable === null) {
+		return Rx.Observable.of(1);
+	}
 	let count = 1;
-	let prev = -1;
-	return observable
-			.do(x => x === prev && count++) // same value count
+	let prevValue = -1;
+	return prevObservable
+			.do(x => x === prevValue && count++) // same value count
 			.distinctUntilChanged() // distinct value only until changed
-			.map(current => ({
-				prev,
-				current
-			})) // keep prev and current
-			.do(prevCurrent => prev = prevCurrent.current) // reset prev
-			.concatMap(prevCurrent => prevCurrent.prev !== -1 ? Rx.Observable.of(count, prevCurrent.prev) : Rx.Observable.empty()) // next Observable
-			.do(x => count = 1) // reset count
-			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prev))); // last Observable
+			.do(x => prevValue = prevValue === -1 ? x : prevValue) // if first time, set prevValue to value only (init)
+			.skip(1) // skip first time because first time is before value changed or stream is completed 
+			.map(newValue => ({prevValue, newValue, count})) // keep prev and new 
+			.do(prevAndNew => [prevValue, count] = [prevAndNew.newValue, 1]) // reset prevValue and count 
+			.map(prevAndNew => ({
+				value: prevAndNew.prevValue,
+				count: prevAndNew.count
+			})) // prevAndNew -> prev Only		
+			.concatMap(prev => Rx.Observable.of(prev.count, prev.value)) // next Observable
+			.concat(Rx.Observable.defer(() => Rx.Observable.of(count, prevValue))); // last Observable
 }
 
 function lookAndSaySeq(n) { 
 	return Rx.Observable.range(1, n)
-			.reduce((next$, current) => current === 1 ? Rx.Observable.of(1) : next(next$), null)
+			.reduce((next$, current) => next(next$), null)
 			.concatAll();
 }
 
