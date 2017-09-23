@@ -9,7 +9,9 @@
  node [js file]  
 
 # file list  
- merge_seq.js  
+ merge_seq.js   
+ flatMapContinue.js    
+ lookAndSayUsingDistinctUntilChanged.js   
 
 # mergeSeq   
 merge로 하되, 요청한 순서에 따라 다음 item을 보여준다. 요청순서가 늦으면 scan에 저장하고 있다가, 사용가능할 때 보여줌.  
@@ -54,7 +56,7 @@ const result$ = source$.let(flatMapContinueLettable([flatmap arguements]));
 ```
 
 # Look-and-say sequence using distinctUntilChanged operator  - 개미수열 distinctUntilChanged 연산자 이용
-distinctUntilChanged 연산자와 내부변수(count, prev)를 이용해서 개미수열을 만들어보았다.    
+distinctUntilChanged 연산자와 내부변수(count, prev)를 이용해서 개미수열을 만들어보았다.     
 look-and-say seqneuce implementation using distinctUntilChanged operator and internal variables(count, prev)   
 
 ```js
