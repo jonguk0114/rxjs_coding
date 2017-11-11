@@ -10,6 +10,7 @@
 
 # file list  
  merge_seq.js   
+ mergeTakeSeq.js   
  flatMapContinue.js    
  lookAndSayUsingDistinctUntilChanged.js   
 
