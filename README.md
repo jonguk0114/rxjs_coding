@@ -36,6 +36,54 @@ Thus, infinite observable causes infinite loop.
  */
  ```
 
+# mergeTakeSeq   
+Merge each observable and emitting sequence is given argument sequence.   
+When last argument is positive number, the value is n and otherwise n is POSITIVE_INFINITY.    
+Emitted value is value from each observable with take(n).last.   
+For example, the following code result is `req1 - 1`, `req - 2`, `req - 3` because
+value n is 2 and 2nd value of interval is 1.   
+In the example, `req1 - 1` is emitted when the result is emitted from the req1$
+and when req3$ emits `req3 - 1`, the result is not emitted because `req2 - 1` is
+not emitted from req2$. When `req2 - 1` is emitted from req2$, `req2 - 1` and
+`req3 - 1` are emitted sequentially.    
+To support instance operator and avoiding dependency with Observable instance,
+lettable operator whose name is `mergeTakeSeqLettable` is provided. The lettable
+operator example is commented in the following example.   
+
+`[Example source code]`
+```js
+const req1$ = Observable.interval(500)
+                .map(value => `req1 - ${value}`)
+                .do(x => console.log(`[do] ${x}`));
+const req2$ = Observable.interval(1000)
+                .map(value => `req2 - ${value}`)
+                .do(x => console.log(`[do] ${x}`));
+const req3$ = Observable.interval(500)
+                .map(value => `req3 - ${value}`)
+                .do(x => console.log(`[do] ${x}`));
+
+mergeTakeSeq(req1$, req2$, req3$, 2)
+    .subscribe(x => console.log(x));
+/*    
+// lettable operator from an observable instance
+req1$.let(mergeTakeSeqLettable(req2$, req3$, 2))
+    .subscribe(x => console.log(x), err => console.log(`ERROR is ${err.message}`));
+*/
+```
+
+`[Example Output]`
+```
+[do] req1 - 0
+[do] req3 - 0
+[do] req2 - 0
+[do] req1 - 1
+req1 - 1
+[do] req3 - 1
+[do] req2 - 1
+req2 - 1
+req3 - 1
+```
+
 # flatMapContinue
 flatMap의 프로젝트함수가 리턴하는 옵저버블이 에러를 낼 때 이를 Observable.empty()를 대신 리턴해줌으로써 무시하고 다음 emit하는 값을 계속하도록 하기위함   
 When the Observable returned by flatMap project function throws error, the error is ignored by Rx.Observable.empty() and continue next emitted values.
@@ -61,7 +109,7 @@ look-and-say seqneuce implementation using distinctUntilChanged operator and int
 
 ```js
 const Rx = require('rxjs/Rx');
-const n = 10;  // sequence number 
+const n = 10;  // sequence number
 const m = 100; // characters length
 const completeSubject = new Rx.Subject().take(m).last();
 function next(prevObservable) {
